@@ -45,6 +45,8 @@ td{padding:5px 6px;border-bottom:1px solid #eef2f5;vertical-align:middle}td.n,th
 .steps b{display:block;margin-bottom:6px;color:var(--navy)}
 .modal .box.w{width:min(780px,94vw)}.rvb{max-height:58vh;overflow:auto;margin:10px 0}.rvb h4{margin:14px 0 4px;font-size:12px;color:var(--navy)}.rvb ul{margin:4px 0;padding-left:18px}.rvb li{margin:2px 0}
 .ok{color:var(--green);font-weight:600}.warn{color:var(--amber);font-weight:600}td.h1.lk{cursor:pointer;color:var(--navy2);text-decoration:underline dotted}
+.badin{border-color:var(--red)!important;background:#fdecea!important}
+@media print{header,.tabs,button,.btn,.del,#persist,#dirty,.modal,#scList{display:none!important}body{background:#fff;font-size:11px}main{display:block;padding:0;max-width:none}main>section+section{margin-top:12px}.card,.kpi,.plant{break-inside:avoid}input{border:none!important;background:none!important;padding:0}.kpis{grid-template-columns:repeat(4,1fr)}}
 @media(max-width:1000px){main{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}}
 </style></head><body>
 <header><h1>Simulador de Absorción · Planta Cramer</h1><span class="src" id="src"></span><span class="sp"></span>
@@ -53,7 +55,7 @@ td{padding:5px 6px;border-bottom:1px solid #eef2f5;vertical-align:middle}td.n,th
 <button class="ghost" id="rutRst" title="Volver a las rutas originales del archivo">Rutas base</button>
 <button class="ghost" id="rutDl" title="Bajar las rutas cargadas en el formato para editar y volver a subir">Descargar rutas</button>
 <label class="btn" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.4)" title="Lee la hoja Rutas. Antes de reemplazar te muestra qué cambia">Actualizar rutas (Excel)<input type="file" id="file" accept=".xlsx" hidden></label></header>
-<nav class="tabs"><button class="on" data-tab="sim">Simulador</button><button data-tab="esc">Escenarios futuros</button></nav>
+<nav class="tabs"><button class="on" data-tab="sim">Simulador</button><button data-tab="esc">Escenarios futuros</button><button data-tab="bas">Bases</button></nav>
 
 <main id="tab-sim">
 <section>
@@ -72,28 +74,39 @@ td{padding:5px 6px;border-bottom:1px solid #eef2f5;vertical-align:middle}td.n,th
 
 <main id="tab-esc" class="hidden">
 <section>
- <div class="kpis"><div class="kpi"><div class="l">Lotes escenario</div><div class="v" id="e_kL">0</div></div><div class="kpi"><div class="l">Horas escenario</div><div class="v" id="e_kH">0</div></div><div class="kpi"><div class="l">$ escenario</div><div class="v" id="e_kM">0</div></div><div class="kpi"><div class="l">2027 + esc. vs 2027</div><div class="v" id="e_kR">–</div></div></div>
+ <div class="kpis"><div class="kpi"><div class="l">Lotes escenario</div><div class="v" id="e_kL">0</div></div><div class="kpi"><div class="l">Horas escenario</div><div class="v" id="e_kH">0</div></div><div class="kpi"><div class="l">$ escenario</div><div class="v" id="e_kM">0</div></div><div class="kpi"><div class="l">Δ vs <span data-lb="p">2027 PEA</span></div><div class="v" id="e_kR">–</div></div></div>
  <div class="card">
   <div class="row" style="margin-bottom:12px">
    <input id="scName" placeholder="Nombre del escenario" style="flex:1;min-width:160px"><span id="dirty" class="warn" title="Hay cambios que no guardaste con el botón Guardar (igual quedan como borrador)"></span><button class="pri" id="save">Guardar</button>
    <select id="scList"><option value="">Escenarios guardados…</option></select><button id="delSc">Borrar</button><button id="newSc">Nuevo</button>
-   <button id="expSc">Exportar</button><label class="btn">Importar<input type="file" id="impSc" accept=".json" hidden></label>
+   <button id="expSc" title="Descarga los escenarios guardados (.json) para respaldarlos o pasárselos a otro">Exportar</button><label class="btn">Importar<input type="file" id="impSc" accept=".json" hidden></label>
    <span id="persist" class="note" style="margin:0;width:100%"></span></div>
   <table><thead><tr><th style="width:190px">Código</th><th class="n" style="width:80px">Lotes</th><th class="n" style="width:110px">Unidades</th><th>Descripción</th><th>Pl.</th><th>Tipo</th><th class="n">Hs / lote</th><th class="n">Horas</th><th class="n">$</th><th></th></tr></thead><tbody id="e_rows"></tbody></table>
   <div class="row" style="margin-top:10px"><button id="e_add">+ Agregar línea</button><button id="e_add10">+10 líneas</button><button class="pri" id="e_bulk">Carga masiva</button><span class="note" style="margin:0">Lotes negativos = pérdida (ej. −50 para sacar la licitación). El escenario se suma al PEA 2027.</span></div>
  </div>
- <div class="card" style="margin-top:18px"><div class="row" style="justify-content:space-between;margin-bottom:10px"><h2 style="margin:0">Comparativo por planta</h2><div class="tog"><button id="tH" class="on">Horas</button><button id="tM">$</button></div></div>
-  <table class="cmp"><thead><tr><th>Planta</th><th class="n">2026</th><th class="n">2027 PEA</th><th class="n esc">Escenario</th><th class="n">2027 + esc.</th><th class="n">Δ vs 2027</th><th class="n">Δ vs 2026</th></tr></thead><tbody id="e_cmp"></tbody></table>
+ <div class="card" style="margin-top:18px"><div class="row" style="justify-content:space-between;margin-bottom:10px"><h2 style="margin:0">Comparativo por planta</h2><div class="row"><button id="repXl" title="Resumen, líneas y horas por centro del escenario en un Excel">Informe Excel</button><button id="repPr" title="Imprimir esta solapa o guardarla como PDF">Imprimir / PDF</button><div class="tog"><button id="tH" class="on">Horas</button><button id="tM">$</button></div></div></div>
+  <table class="cmp"><thead><tr><th>Planta</th><th class="n" data-lb="r">2026</th><th class="n" data-lb="p">2027 PEA</th><th class="n esc">Escenario</th><th class="n"><span data-lb="p">2027 PEA</span> + esc.</th><th class="n">Δ vs <span data-lb="p">2027 PEA</span></th><th class="n">Δ vs <span data-lb="r">2026</span></th></tr></thead><tbody id="e_cmp"></tbody></table>
  </div>
 </section>
 <section>
  <div class="card"><h2>Absorción por planta</h2><div id="plants"></div>
-  <div class="note"><span style="color:#9fb3c8">■</span> 2026 Real+REV2 &nbsp; <span style="color:var(--navy2)">■</span> 2027 PEA &nbsp; <span style="color:var(--amber)">■</span> 2027 PEA + escenario</div></div>
- <div class="card" style="margin-top:18px"><h2>¿Cuánto falta para volver a 2026?</h2>
+  <div class="note"><span style="color:#9fb3c8">■</span> <span data-lb="r">2026</span> &nbsp; <span style="color:var(--navy2)">■</span> <span data-lb="p">2027 PEA</span> &nbsp; <span style="color:var(--amber)">■</span> <span data-lb="p">2027 PEA</span> + escenario</div></div>
+ <div class="card" style="margin-top:18px"><h2>¿Cuánto falta para volver a <span data-lb="r">2026</span>?</h2>
   <div class="row"><select id="gP"><option>A</option><option>B</option><option>C</option></select><input id="gC" list="dl" placeholder="Código para cubrir el gap" style="flex:1" value="605250"></div><div class="gap" id="gOut"></div></div>
- <div class="note">Bases: 2026 = Real + REV2 (OT reales) · 2027 = PEA 2027. Fuente: Absorción 26 vs 27.</div>
+ <div class="note" id="fuente">Bases: 2026 = Real + REV2 (OT reales) · 2027 = PEA 2027. Fuente: Absorción 26 vs 27.</div>
 </section>
 </main>
+<main id="tab-bas" class="hidden" style="grid-template-columns:1fr">
+<section><div class="card"><h2>Bases de absorción por planta</h2>
+ <div class="note" style="margin:0 0 12px">Son los números contra los que se compara cada escenario. Si cambia el plan, editá las celdas amarillas: se guardan en este navegador y viajan dentro del archivo cuando usás <b>Guardar simulador actualizado</b>.</div>
+ <div class="row" style="margin-bottom:12px"><label>Nombre de la referencia <input class="in" id="lbR" style="width:130px"></label><label>Nombre del plan <input class="in" id="lbP" style="width:130px"></label><label style="flex:1;display:flex;gap:6px;align-items:center;min-width:260px">Fuente <input class="in" id="lbF" style="flex:1"></label></div>
+ <table class="cmp"><thead><tr><th>Planta</th><th class="n">Lotes <span data-lb="r">2026</span></th><th class="n">Lotes <span data-lb="p">2027 PEA</span></th><th class="n">Horas <span data-lb="r">2026</span></th><th class="n">Horas <span data-lb="p">2027 PEA</span></th><th class="n">$ <span data-lb="r">2026</span></th><th class="n">$ <span data-lb="p">2027 PEA</span></th></tr></thead><tbody id="bTab"></tbody></table>
+ <div class="row" style="margin-top:12px"><button id="bRst">Volver a las bases del archivo</button><span class="note" id="bEst" style="margin:0"></span></div>
+</div></section>
+</main>
+<div class="modal hidden" id="rx"><div class="box w"><h3>Este archivo trae datos distintos a los guardados en tu navegador</h3>
+ <div class="note" style="margin:0">Pasa cuando alguien te manda un simulador actualizado y vos ya habías cargado rutas o editado bases antes. Elegí con cuáles trabajar (tus escenarios no se tocan).</div><div class="rvb" id="rxB"></div>
+ <div class="row" style="justify-content:flex-end"><button id="rxMio">Seguir con los míos</button><button class="pri" id="rxArch">Usar los del archivo</button></div></div></div>
 <div class="modal hidden" id="bulk"><div class="box">
  <h3>Carga masiva</h3><div class="note" style="margin:0" id="bulkFor"></div>
  <div class="steps">
@@ -182,7 +195,7 @@ function Grid(p,onChange){const g={lines:[],p};
   tr.querySelectorAll('input').forEach(inp=>inp.addEventListener('input',()=>{l[inp.dataset.k]=inp.value;g.update()}));
   tr.querySelector('.del').onclick=()=>{g.lines.splice(i,1);g.render()};tr.querySelector('.h1').onclick=()=>verDetalle(l);tb.appendChild(tr)});g.update()};
  g.update=()=>{const tot={L:0,H:0,M:0,P:{A:{h:0,m:0,le:0,la:0},B:{h:0,m:0,le:0,la:0},C:{h:0,m:0,le:0,la:0}},ct:{}};
-  $(p+'_rows').querySelectorAll('tr').forEach((tr,i)=>{const l=g.lines[i],q=s=>tr.querySelector(s),r=l.code?calc(l):null;
+  $(p+'_rows').querySelectorAll('tr').forEach((tr,i)=>{const l=g.lines[i];if(!l)return;const q=s=>tr.querySelector(s),r=l.code?calc(l):null;
    if(!l.code||!r){['.p','.t','.h1','.h','.m'].forEach(s=>q(s).textContent='');q('.h1').className='n h1';q('.h1').title='';q('.d').innerHTML=l.code?'<span class="err">Código sin ruta</span>':'';return}
    q('.d').textContent=r.c.d;q('.p').innerHTML=`<span class="pill p${'ABC'.includes(r.c.p)?r.c.p:'X'}">${r.c.p}</span>`;q('.t').textContent=r.c.t;q('.h1').textContent=fN(r.h1,1);q('.h1').className='n h1 lk';q('.h1').title='Ver cómo se calcula (operación por operación)';
    q('.h').textContent=fN(r.h);q('.m').textContent=fM(r.m);q('.m').style.whiteSpace='nowrap';q('.h').className='n h'+(r.h<0?' neg':'');q('.m').className='n m'+(r.m<0?' neg':'');
@@ -206,23 +219,23 @@ function renderCmp(t){const k=mode==='H'?['h26','h27','h']:['m26','m27','m'],f=m
 function renderPlants(t){const k=mode==='H'?['h26','h27','h']:['m26','m27','m'],f=mode==='H'?(v=>fN(v)+' hs'):fM;
  const mx=Math.max(...['A','B','C'].flatMap(p=>[BASE[p][k[0]],BASE[p][k[1]],BASE[p][k[1]]+t.P[p][k[2]]]));
  $('plants').innerHTML=['A','B','C'].map(p=>{const b=BASE[p],v26=b[k[0]],v27=b[k[1]],vs=v27+t.P[p][k[2]];
-  return`<div class="plant"><div class="hd"><span><span class="pill p${p}">${p}</span> Planta ${p}</span><span style="font-weight:500;font-size:12px">vs 2027: <span class="${vs-v27<0?'neg':'pos'}">${sg(vs-v27,f)}</span> · vs 2026: <span class="${vs-v26<0?'neg':'pos'}">${sg(vs-v26,f)}</span></span></div>
-  <div class="bars3"><div><span>2026</span><div class="bar"><i class="b26" style="width:${v26/mx*100}%"></i></div><span class="n" style="text-align:right">${f(v26)}</span></div>
-  <div><span>2027 PEA</span><div class="bar"><i class="b27" style="width:${v27/mx*100}%"></i></div><span class="n" style="text-align:right">${f(v27)}</span></div>
-  <div><span>2027 + esc.</span><div class="bar"><i class="bsim" style="width:${Math.max(0,vs)/mx*100}%"></i></div><span class="n" style="text-align:right">${f(vs)}</span></div></div></div>`}).join('')}
+  return`<div class="plant"><div class="hd"><span><span class="pill p${p}">${p}</span> Planta ${p}</span><span style="font-weight:500;font-size:12px">vs ${hx(LB.p)}: <span class="${vs-v27<0?'neg':'pos'}">${sg(vs-v27,f)}</span> · vs ${hx(LB.r)}: <span class="${vs-v26<0?'neg':'pos'}">${sg(vs-v26,f)}</span></span></div>
+  <div class="bars3"><div><span>${hx(LB.r)}</span><div class="bar"><i class="b26" style="width:${v26/mx*100}%"></i></div><span class="n" style="text-align:right">${f(v26)}</span></div>
+  <div><span>${hx(LB.p)}</span><div class="bar"><i class="b27" style="width:${v27/mx*100}%"></i></div><span class="n" style="text-align:right">${f(v27)}</span></div>
+  <div><span>${hx(LB.p)} + esc.</span><div class="bar"><i class="bsim" style="width:${Math.max(0,vs)/mx*100}%"></i></div><span class="n" style="text-align:right">${f(vs)}</span></div></div></div>`}).join('')}
 function renderGap(t){t=t||E.tot;if(!t)return;const p=$('gP').value,b=BASE[p],gh=b.h26-(b.h27+t.P[p].h),gm=b.m26-(b.m27+t.P[p].m);
- let s=gh<=0&&gm<=0?`Planta <b>${p}</b>: con este escenario ya supera 2026 por <b>${fN(-gh)} hs</b> / <b>${fM(-gm)}</b>.`:`Planta <b>${p}</b>: con PEA 2027 + escenario faltan <b>${fN(Math.max(0,gh))} hs</b> y <b>${fM(Math.max(0,gm))}</b> para igualar 2026.`;
+ let s=gh<=0&&gm<=0?`Planta <b>${p}</b>: con este escenario ya supera ${hx(LB.r)} por <b>${fN(-gh)} hs</b> / <b>${fM(-gm)}</b>.`:`Planta <b>${p}</b>: con ${hx(LB.p)} + escenario faltan <b>${fN(Math.max(0,gh))} hs</b> y <b>${fM(Math.max(0,gm))}</b> para igualar ${hx(LB.r)}.`;
  const code=$('gC').value.trim(),c=C()[code];
  if(c&&(gh>0||gm>0)){const r=calc({code,lot:1});s+=`<br>Con <b>${code}</b> (${c.d}): 1 lote = ${fN(r.h,1)} hs / ${fM(r.m)} → <b>${fN(Math.ceil(Math.max(0,gh)/r.h))} lotes</b> para cubrir horas · <b>${fN(Math.ceil(Math.max(0,gm)/r.m))} lotes</b> para cubrir $.`;if(c.p!==p)s+=`<br><span class="err">Ojo: ese código es de Planta ${c.p}.</span>`}
  else if(code&&!c)s+='<br><span class="err">Código sin ruta.</span>';$('gOut').innerHTML=s}
 // ---- eventos
-document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));$('tab-sim').classList.toggle('hidden',b.dataset.tab!=='sim');$('tab-esc').classList.toggle('hidden',b.dataset.tab!=='esc')});
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));['sim','esc','bas'].forEach(t=>$('tab-'+t).classList.toggle('hidden',b.dataset.tab!==t))});
 $('s_add').onclick=()=>{S.lines.push({code:'',lot:'',u:''});S.render()};$('s_clr').onclick=()=>{S.lines=[{code:'',lot:'',u:''},{code:'',lot:'',u:''},{code:'',lot:'',u:''}];S.render()};
 $('e_add').onclick=()=>{E.lines.push({code:'',lot:'',u:''});E.render()};
 async function refreshList(){const o=await store.get();scen=o;$('scList').innerHTML='<option value="">Escenarios guardados…</option>'+Object.keys(o).map(k=>`<option>${k}</option>`).join('')}
-$('save').onclick=async()=>{const n=$('scName').value.trim()||('Escenario '+new Date().toLocaleString('es-AR'));const o=await store.get();o[n]=E.lines.filter(l=>l.code);await store.set(o);await refreshList();$('scList').value=n;$('scName').value=n;marcarSucio();guardarBorrador()};
+$('save').onclick=async()=>{const n=$('scName').value.trim()||('Escenario '+new Date().toLocaleString('es-AR'));const o=await store.get();if(o[n]&&$('scList').value!==n&&!confirm('Ya existe un escenario "'+n+'". ¿Reemplazarlo?'))return;o[n]=E.lines.filter(l=>l.code);await store.set(o);await refreshList();$('scList').value=n;$('scName').value=n;marcarSucio();guardarBorrador()};
 $('scList').onchange=async e=>{const n=e.target.value;if(!n)return;if(marcarSucio()&&!confirm('Tenés cambios sin guardar en "'+($('scName').value||'el escenario actual')+'". ¿Descartarlos y abrir "'+n+'"?')){e.target.value='';return}const o=await store.get();E.lines=JSON.parse(JSON.stringify(o[n]||[]));$('scName').value=n;E.render()};
-$('delSc').onclick=async()=>{const n=$('scList').value;if(!n)return;const o=await store.get();delete o[n];await store.set(o);await refreshList();marcarSucio()};
+$('delSc').onclick=async()=>{const n=$('scList').value;if(!n||!confirm('¿Borrar el escenario "'+n+'"? No se puede deshacer (salvo que lo hayas exportado).'))return;const o=await store.get();delete o[n];await store.set(o);await refreshList();marcarSucio()};
 $('newSc').onclick=()=>{if(marcarSucio()&&!confirm('Tenés cambios sin guardar en "'+($('scName').value||'el escenario actual')+'". ¿Descartarlos?'))return;E.lines=[{code:'',lot:'',u:''}];$('scName').value='';E.render()};
 $('expSc').onclick=async()=>{const o=await store.get();const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(o,null,1)],{type:'application/json'}));a.download='escenarios_absorcion.json';a.click()};
 $('impSc').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const n=JSON.parse(await f.text());const o=await store.get();Object.assign(o,n);await store.set(o);await refreshList();marcarSucio();alert('Importados '+Object.keys(n).length+' escenarios')}catch(err){alert('Archivo inválido')}e.target.value=''};
@@ -236,7 +249,7 @@ $('file').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)r
   if(!nc[k]){const old=C()[k]||{};nc[k]={d:g(r,'Descripción','Descripción Ruta')||old.d,g:old.g||'-',p:old.p||({O:'A',H:'B',C:'C'}[ct[0]]||'-'),t:old.t||(k.startsWith('60')?'ELAB':'ACO'),l:+n(k,r,'Lote STD','LOTE')||old.l,ops:[]}}
   nc[k].ops.push([ct,+n(k,r,'T. Ejec (hs/u)','Tiempo de Ejecución')||0,+n(k,r,'Setup (hs)','Tipo Prep')||0,+n(k,r,'Tasa STD ($/h)','Tasa STD')||0])});
  if(!Object.keys(nc).length)throw'Hoja vacía';revisarRutas(nc,f.name,bad)}catch(err){alert('No pude leer el archivo: '+err)}};
-function aplicarRutas(nc,name){DATA.codes=nc;const fch=new Date().toLocaleDateString('es-AR');try{LS&&LS.setItem(RKEY,JSON.stringify({name,date:fch,codes:nc}))}catch(err2){alert('Las rutas se cargaron, pero el navegador no las pudo guardar. Al cerrar se pierden: usá Guardar simulador actualizado.')}$('src').textContent='Rutas: '+name+' · '+Object.keys(nc).length+' códigos · '+fch;fillDL();S.update();E.update()}
+function aplicarRutas(nc,name){DATA.codes=nc;const fch=new Date().toLocaleDateString('es-AR');try{LS&&LS.setItem(RKEY,JSON.stringify({name,date:fch,codes:nc,orig:hsh(ORIG)}))}catch(err2){alert('Las rutas se cargaron, pero el navegador no las pudo guardar. Al cerrar se pierden: usá Guardar simulador actualizado.')}$('src').textContent='Rutas: '+name+' · '+Object.keys(nc).length+' códigos · '+fch;fillDL();S.update();E.update()}
 // ---- Revisión previa: qué cambia si aplico estas rutas (no modifica nada hasta tocar Aplicar)
 function revisarRutas(nc,name,bad){const cur=C(),k0=Object.keys(cur),k1=Object.keys(nc),nuevos=k1.filter(k=>!cur[k]),fuera=k0.filter(k=>!nc[k]);
  const pc=(a,b)=>a?(b/a-1)*100:(b?Infinity:0),fp=v=>isFinite(v)?sg(v,x=>fN(x,1)+'%'):'nuevo',
@@ -272,7 +285,7 @@ function verDetalle(l){const r=l.code?calc(l):null;if(!r)return;const c=r.c,f6=v
 $('detX').onclick=()=>$('det').classList.add('hidden');
 document.addEventListener('keydown',e=>{if(e.key==='Escape')['bulk','rv','det'].forEach(id=>$(id).classList.add('hidden'))});
 $('cmpBtn').onclick=()=>{compact=!compact;$('cmpBtn').textContent=compact?'Ver $ completo':'Resumir $ (M)';S.update();E.update()};
-$('src').textContent='Rutas: Absorción Cramer V2 · '+Object.keys(C()).length+' códigos';fillDL();
+fillDL();
 // ---- Borrador: lo que está en pantalla (simulador y escenario) se guarda solo en este navegador
 const DKEY='absorcion-borrador';let DRAFT=null,draftOn=false;try{DRAFT=LS&&JSON.parse(LS.getItem(DKEY)||'null')}catch(e){}
 function guardarBorrador(){if(!draftOn||!LS)return;try{LS.setItem(DKEY,JSON.stringify({s:S.lines,e:{name:$('scName').value,lines:E.lines}}))}catch(e){}}
@@ -281,9 +294,12 @@ function marcarSucio(){const n=$('scName').value.trim(),d=E.lines.some(l=>l.code
 $('scName').oninput=()=>{marcarSucio();guardarBorrador()};
 S.lines=DRAFT&&Array.isArray(DRAFT.s)&&DRAFT.s.length?DRAFT.s:[{code:'',lot:'',u:''},{code:'',lot:'',u:''},{code:'',lot:'',u:''}];S.render();
 (async()=>{await refreshList();const PRE='Duta +50 / sin METO 907402',o=await store.get();
- if(!o[PRE]){o[PRE]=[{code:'951331',lot:'50',u:''},{code:'605242',lot:'50',u:''},{code:'907402',lot:'-50',u:''},{code:'605250',lot:'-75',u:''}];await store.set(o);await refreshList()}
+ let ej=null;try{ej=LS&&LS.getItem('absorcion-ejemplo')}catch(e){}// el ejemplo se crea una sola vez: si lo borrás, no vuelve
+ if(!o[PRE]&&!ej){o[PRE]=[{code:'951331',lot:'50',u:''},{code:'605242',lot:'50',u:''},{code:'907402',lot:'-50',u:''},{code:'605250',lot:'-75',u:''}];await store.set(o);await refreshList()}
+ try{LS&&LS.setItem('absorcion-ejemplo','1')}catch(e){}
  const de=DRAFT&&DRAFT.e;if(de&&Array.isArray(de.lines)&&de.lines.length){E.lines=de.lines;$('scName').value=de.name||'';$('scList').value=o[de.name]?de.name:''}
- else{E.lines=JSON.parse(JSON.stringify(o[PRE]));$('scName').value=PRE;$('scList').value=PRE}
+ else if(o[PRE]){E.lines=JSON.parse(JSON.stringify(o[PRE]));$('scName').value=PRE;$('scList').value=PRE}
+ else E.lines=[{code:'',lot:'',u:''}];
  draftOn=true;E.render()})();
 // ---- carga masiva
 let BG=null;
@@ -316,20 +332,66 @@ $('rutDl').onclick=()=>{const rows=[['Código','Operación','Descripción','Cent
  Object.entries(C()).forEach(([k,v])=>v.ops.forEach((o,i)=>rows.push([isNaN(+k)?k:+k,(i+1)*10,v.d,o[0],'',v.l,o[1],o[2],o[3]])));
  const X=XL(),wb=X.utils.book_new(),sh=X.utils.aoa_to_sheet(rows);sh['!cols']=[{wch:11},{wch:10},{wch:44},{wch:14},{wch:14},{wch:10},{wch:14},{wch:10},{wch:14}];X.utils.book_append_sheet(wb,sh,'Rutas');
   X.utils.book_append_sheet(wb,X.utils.aoa_to_sheet([['Editá la hoja "Rutas" (una fila por operación), sin cambiar encabezados ni nombre de hoja.'],['Luego: Actualizar rutas (Excel) → elegí este archivo.'],['Obligatorias: Código, Centro Trabajo, Lote STD, T. Ejec (hs/u), Setup (hs), Tasa STD ($/h).']]),'Instrucciones');X.writeFile(wb,'Plantilla_Rutas_Absorcion.xlsx')};
-// ==== Rutas persistentes ====
-const RKEY='absorcion-rutas',ORIG=JSON.stringify(DATA.codes);
-(function(){try{const v=LS&&LS.getItem(RKEY);if(!v)return;const o=JSON.parse(v);
- if(o&&o.codes&&Object.keys(o.codes).length){DATA.codes=o.codes;
-  $('src').textContent='Rutas: '+o.name+' · '+Object.keys(o.codes).length+' códigos · '+o.date;
-  fillDL();S.update();E.update()}}catch(e){}})();
+// ==== Rutas y bases persistentes ====
+// Lo que guardás en el navegador recuerda de qué archivo salió (orig). Si abrís un archivo con otros datos, se pregunta.
+const hsh=s=>{let h=0x811c9dc5;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,0x01000193)}return(h>>>0).toString(36)};
+const RKEY='absorcion-rutas',ORIG=JSON.stringify(DATA.codes),BKEY='absorcion-bases',KB=['l26','l27','h26','h27','m26','m27'];
+const LB=DATA.lbl=Object.assign({r:'2026',p:'2027 PEA',f:'2026 = Real + REV2 (OT reales) · 2027 = PEA 2027. Fuente: Absorción 26 vs 27.'},DATA.lbl||{});
+const ORIGB=JSON.stringify({base:BASE,lbl:LB}),srcArchivo=()=>DATA.src||('Rutas: Absorción Cramer V2 · '+Object.keys(ORIG?JSON.parse(ORIG):{}).length+' códigos');
+$('src').textContent=srcArchivo();
+function pintarEtiquetas(){document.querySelectorAll('[data-lb]').forEach(e=>e.textContent=LB[e.dataset.lb]);$('fuente').textContent='Bases: '+LB.f}
+function usarRutas(o){DATA.codes=o.codes;$('src').textContent='Rutas: '+o.name+' · '+Object.keys(o.codes).length+' códigos · '+o.date;fillDL();S.update();E.update()}
+function usarBases(o){['A','B','C'].forEach(p=>KB.forEach(k=>{if(o.base&&o.base[p]&&isFinite(o.base[p][k]))BASE[p][k]=+o.base[p][k]}));Object.assign(LB,o.lbl||{});pintarBases()}
+// ---- solapa Bases
+const fIn=v=>(v||0).toLocaleString('es-AR',{maximumFractionDigits:2}),prs=v=>{const t=String(v).replace(/[$\s]/g,'').replace(/\./g,'').replace(',','.');return t===''?NaN:+t};
+function pintarBases(){$('bTab').innerHTML=['A','B','C'].map(p=>`<tr><td><span class="pill p${p}">${p}</span> Planta ${p}</td>`+KB.map(k=>`<td class="n"><input class="in" data-p="${p}" data-k="${k}" value="${fIn(BASE[p][k])}" style="width:${k[0]==='m'?150:90}px;text-align:right"></td>`).join('')+'</tr>').join('')+
+  '<tr style="font-weight:700;background:#f3f6f9"><td>Total</td>'+KB.map(k=>`<td class="n" id="bT_${k}"></td>`).join('')+'</tr>';
+ $('bTab').querySelectorAll('input').forEach(i=>{i.oninput=()=>{const v=prs(i.value);i.classList.toggle('badin',!isFinite(v));if(!isFinite(v))return;BASE[i.dataset.p][i.dataset.k]=v;guardarBases()};i.onblur=()=>{i.classList.remove('badin');i.value=fIn(BASE[i.dataset.p][i.dataset.k])}});
+ $('lbR').value=LB.r;$('lbP').value=LB.p;$('lbF').value=LB.f;totBases();pintarEtiquetas()}
+function totBases(){KB.forEach(k=>$('bT_'+k).textContent=(k[0]==='m'?fM:fN)(['A','B','C'].reduce((a,p)=>a+BASE[p][k],0)));
+ const igual=JSON.stringify({base:BASE,lbl:LB})===ORIGB;$('bEst').innerHTML=igual?'Iguales a las que trae el archivo.':'<span class="warn">Modificadas: distintas a las que trae el archivo.</span>';return igual}
+function guardarBases(){const igual=totBases();pintarEtiquetas();E.update();try{if(!LS)return;if(igual)LS.removeItem(BKEY);else LS.setItem(BKEY,JSON.stringify({base:BASE,lbl:LB,date:new Date().toLocaleDateString('es-AR'),orig:hsh(ORIGB)}))}catch(e){}}
+[['lbR','r'],['lbP','p'],['lbF','f']].forEach(([id,k])=>$(id).oninput=()=>{LB[k]=$(id).value||({r:'Referencia',p:'Plan',f:''}[k]);guardarBases()});
+$('bRst').onclick=()=>{if(!confirm('¿Volver a las bases que trae el archivo? Se pierden tus cambios en esta solapa.'))return;usarBases(JSON.parse(ORIGB));guardarBases()};
+pintarBases();
+// ---- al abrir: rutas y bases guardadas en el navegador
+(function(){const cf=[];let r=null,b=null;try{r=LS&&JSON.parse(LS.getItem(RKEY)||'null')}catch(e){}try{b=LS&&JSON.parse(LS.getItem(BKEY)||'null')}catch(e){}
+ if(r&&r.codes&&Object.keys(r.codes).length){if(JSON.stringify(r.codes)===ORIG||r.orig===hsh(ORIG))usarRutas(r);else cf.push('r')}
+ if(b&&b.base){if(JSON.stringify({base:b.base,lbl:Object.assign({},LB,b.lbl)})===ORIGB||b.orig===hsh(ORIGB))usarBases(b);else cf.push('b')}
+ if(!cf.length)return;const fC=JSON.parse(ORIG);let h='';
+ if(cf.includes('r')){const dif=Object.keys(Object.assign({},fC,r.codes)).filter(k=>JSON.stringify(fC[k])!==JSON.stringify(r.codes[k])).length;
+  h+=`<h4>Rutas</h4><ul><li>En el archivo: <b>${Object.keys(fC).length} códigos</b> (${hx(srcArchivo().replace(/^Rutas: /,''))})</li><li>En tu navegador: <b>${Object.keys(r.codes).length} códigos</b> · ${hx(r.name)} · cargadas el ${hx(r.date)}</li><li>${dif} códigos tienen datos distintos.</li></ul>`}
+ if(cf.includes('b')){const fB=JSON.parse(ORIGB).base,d=[];['A','B','C'].forEach(p=>KB.forEach(k=>{if(b.base[p]&&b.base[p][k]!==fB[p][k])d.push(`Planta ${p} · ${k[0]==='l'?'Lotes':k[0]==='h'?'Horas':'$'} ${k.endsWith('26')?LB.r:LB.p}: archivo ${fIn(fB[p][k])} · tuyas ${fIn(b.base[p][k])}`)}));
+  h+=`<h4>Bases</h4><div class="note" style="margin:0">Tus bases las editaste el ${hx(b.date||'?')}.</div><ul>${d.slice(0,8).map(x=>'<li>'+hx(x)+'</li>').join('')}${d.length>8?`<li>… y ${d.length-8} más</li>`:''}${d.length?'':'<li>Cambian los nombres o la fuente.</li>'}</ul>`}
+ $('rxB').innerHTML=h;$('rx').classList.remove('hidden');
+ $('rxArch').onclick=()=>{try{if(cf.includes('r'))LS.removeItem(RKEY);if(cf.includes('b'))LS.removeItem(BKEY)}catch(e){}$('rx').classList.add('hidden')};
+ $('rxMio').onclick=()=>{try{if(cf.includes('r')){r.orig=hsh(ORIG);LS.setItem(RKEY,JSON.stringify(r));usarRutas(r)}if(cf.includes('b')){b.orig=hsh(ORIGB);usarBases(b);guardarBases()}}catch(e){}$('rx').classList.add('hidden')}})();
 $('rutRst').onclick=()=>{if(!confirm('¿Volver a las rutas originales con las que vino el archivo?'))return;
  DATA.codes=JSON.parse(ORIG);try{LS&&LS.removeItem(RKEY)}catch(e){}
- $('src').textContent='Rutas: base original · '+Object.keys(C()).length+' códigos';fillDL();S.update();E.update()};
+ $('src').textContent=srcArchivo();fillDL();S.update();E.update()};
+// ---- informe del escenario
+$('repPr').onclick=()=>window.print();
+$('repXl').onclick=()=>{const t=E.tot;if(!t)return;const n=$('scName').value.trim()||'Escenario sin nombre',hoy=new Date().toLocaleDateString('es-AR');
+ const tabla=(tit,k,r1)=>{const T=[0,0,0,0],fil=['A','B','C'].map(p=>{const b=BASE[p],a=b[k[0]],c=b[k[1]],es=t.P[p][k[2]],vs=c+es;[a,c,es,vs].forEach((v,i)=>T[i]+=v);return['Planta '+p,r1(a),r1(c),r1(es),r1(vs),r1(vs-c),r1(vs-a),a?Math.round((vs-a)/a*1000)/10:'']});
+  return[[tit],['Planta',LB.r,LB.p,'Escenario',LB.p+' + esc.','Δ vs '+LB.p,'Δ vs '+LB.r,'Δ % vs '+LB.r],...fil,['Total',r1(T[0]),r1(T[1]),r1(T[2]),r1(T[3]),r1(T[3]-T[1]),r1(T[3]-T[0]),T[0]?Math.round((T[3]-T[0])/T[0]*1000)/10:''],[]]};
+ const r1=v=>Math.round(v*10)/10,r2=v=>Math.round(v*100)/100,r0=v=>Math.round(v);
+ const res=[['Informe de absorción · Planta Cramer'],['Escenario',n],['Fecha',hoy],['Rutas',$('src').textContent.replace(/^Rutas: /,'')],['Bases',LB.f],[],
+  ...tabla('HORAS',['h26','h27','h'],r1),...tabla('$ ABSORCIÓN',['m26','m27','m'],r0),['¿Cuánto falta?'],...$('gOut').innerText.split('\n').map(x=>[x])];
+ const lin=[['Código','Descripción','Planta','Tipo','Lotes','Unidades','Hs / lote','Horas','$']];
+ E.lines.filter(l=>l.code).forEach(l=>{const r=calc(l),k=String(l.code).trim(),c=isNaN(+k)?k:+k;lin.push(r?[c,r.c.d,r.c.p,r.c.t,r.lot,r.u,r2(r.h1),r2(r.h),r0(r.m)]:[c,'Código sin ruta'])});
+ const ct=[['Centro de trabajo','Horas']].concat(Object.entries(t.ct).filter(([k,v])=>Math.abs(v)>.05).sort((a,b)=>Math.abs(b[1])-Math.abs(a[1])).map(([k,v])=>[k,r1(v)]));
+ const X=XL(),wb=X.utils.book_new(),s1=X.utils.aoa_to_sheet(res),s2=X.utils.aoa_to_sheet(lin),s3=X.utils.aoa_to_sheet(ct);
+ s1['!cols']=[{wch:16},{wch:16},{wch:16},{wch:16},{wch:18},{wch:16},{wch:16},{wch:12}];s2['!cols']=[{wch:10},{wch:44},{wch:7},{wch:7},{wch:8},{wch:12},{wch:9},{wch:10},{wch:16}];s3['!cols']=[{wch:18},{wch:12}];
+ X.utils.book_append_sheet(wb,s1,'Resumen');X.utils.book_append_sheet(wb,s2,'Líneas');X.utils.book_append_sheet(wb,s3,'Por centro');
+ X.writeFile(wb,'Informe_'+n.replace(/[^\w\-áéíóúñÁÉÍÓÚÑ +]/g,'').trim().replace(/\s+/g,'_').slice(0,40)+'_'+new Date().toISOString().slice(0,10)+'.xlsx')};
 $('htmlDl').onclick=()=>{try{
- const html=document.documentElement.outerHTML,cierre='<'+'/script>';
+ // copia limpia: sin las filas, listas ni ventanas que estaban abiertas en pantalla
+ const doc=document.documentElement.cloneNode(true);['s_rows','e_rows','dl','rvB','detB','rxB','plants','e_cmp','s_pl','s_ct','gOut'].forEach(id=>{const e=doc.querySelector('#'+id);if(e)e.innerHTML=''});
+ doc.querySelectorAll('.modal').forEach(m=>m.classList.add('hidden'));doc.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab==='sim'));['tab-esc','tab-bas'].forEach(id=>doc.querySelector('#'+id).classList.add('hidden'));doc.querySelector('#tab-sim').classList.remove('hidden');
+ const html=doc.outerHTML,cierre='<'+'/script>';
  const i=html.indexOf('id="db"');if(i<0)throw'no encuentro el bloque de datos';
  const a1=html.indexOf('>',i)+1,a2=html.indexOf(cierre,a1);if(a2<0)throw'bloque de datos incompleto';
- const out='<!DOCTYPE html>\n'+html.slice(0,a1)+'\nlet DATA='+JSON.stringify({codes:DATA.codes,base:BASE})+';\n'+html.slice(a2);
+ const out='<!DOCTYPE html>\n'+html.slice(0,a1)+'\nlet DATA='+JSON.stringify({codes:DATA.codes,base:BASE,lbl:LB,src:$('src').textContent})+';\n'+html.slice(a2);
  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([out],{type:'text/html'}));
  a.download='Simulador_Absorcion_Cramer_'+new Date().toISOString().slice(0,10)+'.html';a.click();
 }catch(e){alert('No pude generar el archivo: '+e)}};
