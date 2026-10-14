@@ -1,6 +1,18 @@
 # Simulador de Absorción · notas de mantenimiento
 
-## Hecho (octubre 2026)
+## v3 (`Simulador Absorcion Cramer V3.html`): solapa "Tablero de planta"
+- Horas del plan **por centro de trabajo**: volumen por código (hoja Volumen) × rutas, con la misma cuenta del simulador.
+  Cierra exacto con las bases por planta.
+- **Capacidad**: horas disponibles por centro (a cargar) → % de uso y centro más cargado.
+- **Costo fijo**: costo anual por centro (a cargar, o aproximado con lo absorbido en el año de referencia) → sin absorber,
+  tarifa STD promedio, tarifa necesaria y Δ tarifa.
+- **Dotación MO**: horas de centros -MO ÷ horas por persona.
+- **Escenario**: columnas Prob. % y Desde (mes). Solo se usan en el Tablero; los totales de la solapa Escenarios no se ponderan.
+- Claves nuevas en el navegador: `absorcion-centros`, `absorcion-volumen`. Todo viaja con "Guardar simulador actualizado".
+- Límites: la planta del Tablero sale del prefijo del centro (O = A, H = B, C = C); la capacidad es por centro, no por máquina
+  (la plantilla trae "Máquina" pero las rutas no la guardan); el plan mes a mes del volumen se asume parejo.
+
+## V2 (octubre 2026)
 1. **Excel sin internet**: si el proxy bloquea SheetJS (CDN), el simulador usa un lector/escritor de .xlsx propio
    (bloque `MiniXLSX` en el HTML). El CDN carga en segundo plano y ya no traba la apertura.
 2. **Nada se pierde al cerrar**: el Simulador y el escenario en pantalla se guardan solos como borrador
